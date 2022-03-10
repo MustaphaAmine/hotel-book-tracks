@@ -1,0 +1,70 @@
+version: '3.7'
+# ================================== AIRFLOW ENVIRONMENT VARIABLES =================================== #
+x-environment: &airflow-environment
+  - AIRFLOW__CORE__LOAD_EXAMPLES=FALSE
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow_user:airflow_pass@postgres/airflow_db
+x-airflow-image: &airflow-image apache/airflow:2.2.4-python3.9
+# ========================================== AIRFLOW SERVICES ======================================== #
+services:
+  # Metadata Database
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=airflow_user
+      - POSTGRES_PASSWORD=airflow_pass
+      - POSTGRES_DB=airflow_db
+    ports:
+      - '5432:5432'
+    restart: always
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "airflow_db", "-U", "airflow_user" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  # Webserver
+  webserver:
+    image: airflow-custom-base-image
+    build: 
+      context: ./docker
+      args: 
+        AIRFLOW_IMG: *airflow-image
+    environment: *airflow-environment
+    ports:
+      - '8080:8080'
+    restart: always
+    volumes:
+      - ./mnt/airflow/dags:/opt/airflow/dags
+      - ./mnt/airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    entrypoint: /bin/bash
+    command: > 
+       -c 'airflow db upgrade \
+            && sleep 5  \
+            && airflow users create --username airflow \
+                                  --password airflow \
+                                  --firstname airflow \
+                                  --lastname airflow \
+                                  --role Admin \
+                                  --email airflow@airflow.com \
+            && airflow webserver'
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD","nc","-z","airflow","8080"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+  # Schedular
+  scheduler:
+    image: airflow-custom-base-image
+    build:
+      context: ./docker
+      args: 
+        AIRFLOW_IMG: *airflow-image
+    environment: *airflow-environment
+    command: scheduler
+    restart: always
+    volumes:
+      - ./mnt/airflow/dags:/opt/airflow/dags
+      - ./mnt/airflow/airflow.cfg:/opt/airflow/airflow.cfg
+    depends_on:
+      - postgres
