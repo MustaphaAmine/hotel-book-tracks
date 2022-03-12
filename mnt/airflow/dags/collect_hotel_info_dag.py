@@ -12,6 +12,7 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.utils.dates import days_ago
 
 from custom.operators.HotelsToGCSOperator import HotelsToGCSOperator
+from custom.operators.WeatherToGCSOperator import WeatherToGCSOperator
 
 with DAG(
     'bookings_track_dag',
@@ -24,22 +25,4 @@ with DAG(
     schedule_interval = '0 0 * * *',
     catchup=True,
 ) as dag:
-    t1 = BashOperator(
-        task_id='print_date',
-        bash_command = "date", 
-        dag = dag
-    )
-    t2 = BashOperator(
-        task_id='print_ds',
-        bash_command = "echo {{ds}}"
-    )
-    hotels_to_gcs = HotelsToGCSOperator(
-        task_id = "upload_hotels_to_gcs",
-        dag = dag,
-    )
-    t3 = BashOperator(
-        task_id='print_end',
-        bash_command = "echo 'end'", 
-        dag = dag
-    )
-    t1>>hotels_to_gcs>>t2>>t3
+    raise NotImplementedError()
