@@ -41,7 +41,6 @@ class HotelHook(BaseHook):
         self._session = requests.session()
         return self._session, self._base_url, self._headers
 
-  
     def get_all_hotels(
         self,
         checkin_date="2022-04-08",
@@ -71,10 +70,10 @@ class HotelHook(BaseHook):
                 "units": units,
                 "dest_id": location["dest_id"],
             }
-            yield from self._get_hotel_by_location(session, base_url, headers, params)
+            yield from self._get_hotel_by_location(session, base_url, headers, params, location["dest_id"])
 
     def _get_hotel_by_location(
-        self, session, base_url, headers, params, endpoint="v1/hotels/search"
+        self, session, base_url, headers, params, dest_id, endpoint="v1/hotels/search"
     ):
         hotel_relevant_info = [
             "hotel_id",
@@ -92,11 +91,13 @@ class HotelHook(BaseHook):
             "review_score_word",
             "url",
         ]
-        yield from pd.DataFrame(
+        hotels_filtered_info = pd.DataFrame(
             session.request(
                 "GET", base_url + endpoint, headers=headers, params=params
             ).json()["result"]
-        )[hotel_relevant_info].to_dict("records")
+        )[hotel_relevant_info]
+        hotels_filtered_info.loc[:,"dest_id"] = dest_id
+        yield from hotels_filtered_info.to_dict("records")
 
     def _get_location_from_gcs(self):
         """Downlaod location information from the Google Cloud Storage Bucket"""
