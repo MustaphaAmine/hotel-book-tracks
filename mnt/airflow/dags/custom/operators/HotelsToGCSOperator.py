@@ -18,7 +18,7 @@ class HotelsToGCSOperator(BaseOperator):
         h_conn_id="hotel_book_conn",
         gcp_conn_id="google_cloud_default",
         bucket_name="hotel-book-track-bucket",
-        bucket_hotel_sub_dir="hotel-bookings",
+        bucket_hotel_subdir="hotel-bookings",
         *args,
         **kwargs,
     ):
@@ -26,7 +26,7 @@ class HotelsToGCSOperator(BaseOperator):
         self._conn_id = h_conn_id
         self._gcp_conn_id = gcp_conn_id
         self._bucket_name = bucket_name
-        self._bucket_hotel_sub_dir = bucket_hotel_sub_dir
+        self._bucket_hotel_subdir = bucket_hotel_subdir
 
     def execute(self, context):
         hotel_hook = HotelHook(conn_id=self._conn_id, gcs_conn_id=self._gcp_conn_id)
@@ -40,7 +40,7 @@ class HotelsToGCSOperator(BaseOperator):
                     json.dump(hotels, f, ensure_ascii=False)
                 gcs_hook.upload(
                     bucket_name=self._bucket_name,
-                    object_name=f"{self._bucket_hotel_sub_dir}/hotels_%s.json"
+                    object_name=f"{self._bucket_hotel_subdir}/hotels_%s.json"
                     % context["data_interval_end"].strftime("%Y-%m-%d"),
                     filename=tmp_path,
                 )
