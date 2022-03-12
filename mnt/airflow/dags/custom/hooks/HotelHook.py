@@ -9,7 +9,7 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook
 class HotelHook(BaseHook):
     DEFAULT_SCHEMA = "https"
 
-    def __init__(self, conn_id="hotel_book_api", gcs_conn_id="google_cloud_default", retry=3):
+    def __init__(self, conn_id="hotel_book_conn", gcs_conn_id="google_cloud_default", retry=3):
         super().__init__()
 
         self._retry = retry
@@ -41,6 +41,7 @@ class HotelHook(BaseHook):
         self._session = requests.session()
         return self._session, self._base_url, self._headers
 
+  
     def get_all_hotels(
         self,
         checkin_date="2022-04-08",
