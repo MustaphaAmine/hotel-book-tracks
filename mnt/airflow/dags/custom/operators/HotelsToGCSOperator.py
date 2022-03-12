@@ -39,7 +39,7 @@ class HotelsToGCSOperator(BaseOperator):
                     json.dump(hotels, f, ensure_ascii=False)
                 gcs_hook.upload(
                     bucket_name=self._bucket_name,
-                    object_name=f"{self._bucket_hotel_sub_dir}/hotels_{self._end_date}.json",
+                    object_name=f"{self._bucket_hotel_sub_dir}/hotels_%s.json" % context["ds"],
                     filename=tmp_path,
                 )
         finally:

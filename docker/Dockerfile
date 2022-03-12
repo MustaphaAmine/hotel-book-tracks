@@ -13,7 +13,6 @@ RUN mkdir -p /data \
     && chown airflow /data
 
 RUN pip install --user --no-cache-dir \
-    apache-airflow-providers-google==1.0.0
-    # apache-airflow-providers-google==2.2.0
+    apache-airflow-providers-google==2.2.0
 
 USER airflow
