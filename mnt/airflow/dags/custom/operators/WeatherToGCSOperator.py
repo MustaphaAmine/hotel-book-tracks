@@ -36,14 +36,17 @@ class WeatherToGCSOperator(BaseOperator):
             locations_weather = pd.DataFrame(
                 list(weather_hook.get_weather_all_locations())
             )
+            locations_weather = self.formating_weather_data(
+                locations_weather[
+                    pd.to_datetime(locations_weather.dt_txt).dt.strftime("%Y-%m-%d")
+                    == context["data_interval_end"].strftime("%Y-%m-%d")
+                ]
+            )
             with tempfile.TemporaryDirectory() as tmp_dir:
                 tmp_path = os.path.join(tmp_dir, "weather.json")
                 with open(tmp_path, "w", encoding="utf-8") as f:
                     json.dump(
-                        locations_weather[
-                            pd.to_datetime(locations_weather.dt_txt).dt.strftime("%Y-%m-%d")
-                            == context["data_interval_end"].strftime("%Y-%m-%d")
-                        ].to_dict("records"),
+                        locations_weather.to_dict("records"),
                         f,
                         ensure_ascii=False,
                     )
@@ -55,3 +58,13 @@ class WeatherToGCSOperator(BaseOperator):
                 )
         finally:
             weather_hook.close()
+
+    def formating_weather_data(self, df):
+        return pd.DataFrame(
+            [
+                {"dest_id": dest_id, "weather": df_dest_id.to_dict("records")}
+                for dest_id, df_dest_id in df[
+                    ["dest_id", "main", "visibility", "wind", "dt_txt"]
+                ].groupby(["dest_id"])
+            ]
+        )
