@@ -8,3 +8,4 @@ __pypackages__/
 
 # Environments
 env/
+mnt/airflow/airflow.cfg
