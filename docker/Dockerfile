@@ -12,7 +12,10 @@ RUN apt-get update \
 RUN mkdir -p /data \
     && chown airflow /data
 
-RUN pip install --user --no-cache-dir \
-    apache-airflow-providers-google==2.2.0
+RUN python -m pip install --upgrade pip \
+    && pip install --user --no-cache-dir \
+        apache-airflow-providers-google==2.2.0 
 
 USER airflow
+RUN python -m pip install --upgrade pip \
+    && pip install 'simplejson==3.17.6'
