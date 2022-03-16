@@ -15,10 +15,10 @@ class HotelsToGCSOperator(BaseOperator):
     @apply_defaults
     def __init__(
         self,
-        h_conn_id="hotel_book_conn",
-        gcp_conn_id="google_cloud_default",
-        bucket_name="hotel-book-track-bucket",
-        bucket_hotel_subdir="hotel-bookings",
+        h_conn_id,
+        gcp_conn_id,
+        bucket_name,
+        bucket_hotel_subdir,
         *args,
         **kwargs,
     ):

@@ -14,10 +14,10 @@ class MergeHotelWeather(BaseOperator):
     @apply_defaults
     def __init__(
         self,
-        gcp_conn_id="google_cloud_default",
-        bucket_name="hotel-book-track-bucket",
-        bucket_weather_subdir="weather-data",
-        bucket_hotel_subdir="hotel-bookings",
+        gcp_conn_id,
+        bucket_name,
+        bucket_weather_subdir,
+        bucket_hotel_subdir,
         *args,
         **kwargs,
     ):

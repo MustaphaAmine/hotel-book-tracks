@@ -16,10 +16,10 @@ class WeatherToGCSOperator(BaseOperator):
     @apply_defaults
     def __init__(
         self,
-        w_conn_id="weather_api_conn",
-        gcp_conn_id="google_cloud_default",
-        bucket_name="hotel-book-track-bucket",
-        bucket_weather_subdir="weather-data",
+        w_conn_id,
+        gcp_conn_id,
+        bucket_name,
+        bucket_weather_subdir,
         *args,
         **kwargs,
     ):
